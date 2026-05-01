@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { Card } from '../../components/Card';
 
-import { LayoutDashboard, Users, Gift, Layers } from 'lucide-react';
+import { Users, Gift, Layers } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [data, setData] = useState({

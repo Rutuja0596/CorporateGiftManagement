@@ -1,0 +1,317 @@
+// import React, { useEffect, useState } from 'react';
+// import api from '../../services/api';
+// import { Campaign } from '../../types';
+// import { Plus, Trash2 } from 'lucide-react';
+// import { Button } from '../../components/Button';
+
+// export default function ManageCampaigns() {
+//   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+//   const [name, setName] = useState('');
+//   const [desc, setDesc] = useState('');
+
+//   useEffect(() => { fetchCampaigns(); }, []);
+
+//   const fetchCampaigns = async () => {
+//     const res = await api.get('/campaigns');
+//     setCampaigns(res.data);
+//   };
+
+//   const handleCreate = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     await api.post('/campaign', { name, description: desc });
+//     setName(''); setDesc('');
+//     fetchCampaigns();
+//   };
+//   const toggleCampaign = async (id: number) => {
+//   try {
+//     await api.put(`/campaign/${id}/toggle`);
+//     fetchCampaigns(); // refresh UI
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+//   return (
+//     <div className="space-y-8">
+//       {/* Create Form */}
+//       <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+//         <h3 className="text-lg font-bold mb-4 flex items-center">
+//           <Plus className="mr-2 text-blue-600" /> Create New Campaign
+//         </h3>
+//         <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//   <input 
+//     placeholder="Campaign Name" required
+//     value={name} onChange={e => setName(e.target.value)}
+//   />
+//   <input 
+//     placeholder="Description" required
+//     value={desc} onChange={e => setDesc(e.target.value)}
+//   />
+//   <button type="submit">
+//     Create Campaign
+//   </button>
+// </form>
+//       </div>
+
+//       {/* List Table */}
+//       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+//         <table className="w-full text-left">
+//           <thead>
+//   <tr>
+//     <th>ID</th>
+//     <th>Campaign Name</th>
+//     <th>Description</th>
+//     <th>Status</th>   {/* ADD THIS */}
+//     <th>Actions</th>
+//   </tr>
+// </thead>
+//           <tbody className="divide-y divide-slate-100">
+//   {campaigns.map(c => (
+//   <tr key={c.id}>
+//     <td>{c.name}</td>
+//     <td>{c.description}</td>
+
+//     <td>
+//       {c.is_active ? "Active" : "Inactive"}
+//     </td>
+
+//     <td>
+//       <Button onClick={() => toggleCampaign(c.id)}>
+//         {c.is_active ? "Deactivate" : "Activate"}
+//       </Button>
+//     </td>
+//   </tr>
+// ))}
+
+//       {/* STATUS */}
+//       <td className="px-6 py-4">
+//         <span className={`px-3 py-1 rounded text-sm font-semibold ${
+//           c.is_active 
+//             ? "bg-green-100 text-green-700" 
+//             : "bg-gray-200 text-gray-600"
+//         }`}>
+//           {c.is_active ? "Active" : "Inactive"}
+//         </span>
+//       </td>
+
+//       {/* ACTION BUTTON */}
+//       <td className="px-6 py-4">
+//         <Button onClick={() => toggleCampaign(c.id)}>
+//           {c.is_active ? "Deactivate" : "Activate"}
+//         </Button>
+//       </td>
+//     </tr>
+//   ))}
+// </tbody>
+//         </table>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+////////////////////////////////////////////////
+
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import { Button } from '../components/Button';
+import { Card } from '../components/Card';
+import { Message } from '../components/Message';
+import { Campaign } from '../types';
+import { Calendar, ArrowRight } from 'lucide-react';
+
+export default function Campaigns() {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  const fetchCampaigns = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/campaigns');
+      setCampaigns(response.data);
+      setError('');
+    } catch (err: any) {
+      setError('Failed to load campaigns');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-4"></div>
+        <p className="text-lg text-gray-600">Loading campaigns...</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {error && <Message type="error" message={error} />}
+      
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Campaigns</h1>
+        <p className="text-xl text-gray-600">Choose a campaign to explore gifts</p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        // {campaigns.map((campaign) => (
+        {campaigns
+  .filter(c => c.is_active)
+  .map((campaign) => (
+          <Card key={campaign.id} hoverEffect>
+            <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl mb-6 flex items-end p-6">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 w-full">
+                <div className="flex items-center text-white mb-3">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  <span className="text-sm font-medium opacity-90">
+  {campaign.is_active ? "Active Campaign" : "Inactive Campaign"}
+</span>
+                </div>
+                <h3 className="text-2xl font-bold text-white mb-2 truncate">
+                  {campaign.name}
+                </h3>
+                <p className="text-white/90 text-sm mb-4 line-clamp-2">
+                  {campaign.description}
+                </p>
+              </div>
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => navigate(`/campaigns/${campaign.id}/gifts`)}
+            >
+              View Gifts <ArrowRight className="w-5 h-5 ml-1" />
+            </Button>
+          </Card>
+        ))}
+      </div>
+        
+      {campaigns.length === 0 && !loading && (
+        <Card className="text-center py-20 col-span-full">
+          <p className="text-2xl text-gray-500 mb-4">No campaigns available</p>
+          <Button variant="outline" onClick={fetchCampaigns}>
+            Refresh
+          </Button>
+        </Card>
+      )}
+    </>
+  );
+}
+
+/////////////////////////////////////
+Gifts.tsx
+/////////////////////////////////////
+paste from line 95-111
+////////////////////////////////////
+
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import api from '../services/api';
+import { Button } from '../components/Button';
+import { Card } from '../components/Card';
+import { Message } from '../components/Message';
+import { Gift } from '../types';
+import { GiftIcon, ShoppingCart, CheckCircle } from 'lucide-react';
+
+export default function Gifts() {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const [gifts, setGifts] = useState<Gift[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selecting, setSelecting] = useState(false);
+  const [alreadyHasOrder, setAlreadyHasOrder] = useState(false); // NEW STATE
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+
+  useEffect(() => {
+    const initPage = async () => {
+      try {
+        setLoading(true);
+        // 1. Fetch Gifts
+        const giftRes = await api.get(`/gifts/${id}`);
+        setGifts(giftRes.data);
+
+        // 2. Check if user already has an order
+        const orderRes = await api.get('/my-order');
+        if (orderRes.data && orderRes.data[0]) {
+          setAlreadyHasOrder(true);
+        }
+      } catch (err) {
+        console.error("Initialization failed", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) initPage();
+  }, [id]);
+
+
+  const selectGift = async (giftId: number) => {
+    if (alreadyHasOrder) return; // Block logic-level
+
+    try {
+      setSelecting(true);
+      const res = await api.post(`/select-gift/${giftId}`);
+      
+      // Handle backend "error" message if it comes as a 200 OK
+      if (res.data.error) {
+        setError(res.data.error);
+        setAlreadyHasOrder(true);
+      } else {
+        setSuccess('Gift selected successfully!');
+        setAlreadyHasOrder(true);
+        setTimeout(() => navigate('/orders'), 2000);
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to select gift');
+    } finally {
+      setSelecting(false);
+    }
+  };
+
+  if (loading) return <div className="text-center py-20">Loading...</div>;
+
+  return (
+    <div className="p-6">
+      {alreadyHasOrder && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center text-amber-800">
+          <CheckCircle className="mr-2" />
+          You have already selected a gift for this period.
+        </div>
+      )}
+
+      {error && <Message type="error" message={error} onClose={() => setError('')} />}
+      {success && <Message type="success" message={success} onClose={() => setSuccess('')} />}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {gifts.map((gift) => (
+          <Card key={gift.id}>
+             {/* ... Gift Details ... */}
+             <h3 className="text-xl font-bold mb-2">{gift.name}</h3>
+             
+             <Button
+              className="w-full"
+              // DISABLE BUTTON if user already has an order OR currently selecting
+              disabled={alreadyHasOrder || selecting}
+              loading={selecting}
+              onClick={() => selectGift(gift.id)}
+            >
+              {alreadyHasOrder ? 'Selection Locked' : 'Select Gift'}
+              {!alreadyHasOrder && <ShoppingCart className="w-5 h-5 ml-2" />}
+            </Button>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,69 @@
+# ========================
+# 🔐 Environment variables
+# ========================
+.env
+.env.*
+*.env
+
+# ========================
+# 🐍 Python / Backend
+# ========================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# FastAPI / logs
+*.log
+
+# Alembic
+alembic.ini
+
+# ========================
+# ⚛️ React / Frontend
+# ========================
+node_modules/
+build/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ========================
+# 🐳 Docker
+# ========================
+*.pid
+*.seed
+*.pid.lock
+
+# Docker override files
+docker-compose.override.yml
+
+# ========================
+# 🧠 IDE / Editor
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ========================
+# 🖥️ OS files
+# ========================
+.DS_Store
+Thumbs.db
+
+# ========================
+# 🗂️ Misc
+# ========================
+coverage/
+*.coverage
+.cache/

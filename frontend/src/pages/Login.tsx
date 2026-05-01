@@ -18,7 +18,7 @@ export default function Login() {
   
   const navigate = useNavigate();
   const { login } = useAuth();
-const { isAuthenticated, role } = useAuth();
+  const { isAuthenticated, role } = useAuth();
 
 useEffect(() => {
   if (isAuthenticated) {
@@ -28,7 +28,7 @@ useEffect(() => {
       navigate("/campaigns", { replace: true });
     }
   }
-}, [isAuthenticated, role]);
+}, [isAuthenticated, role, navigate]); // 
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
